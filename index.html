@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ColorHelper</title>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f9fafb;
+            touch-action: pan-y;
+            -webkit-tap-highlight-color: transparent;
+        }
+        button { 
+            -webkit-appearance: none;
+            border: none;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .container { max-width: 28rem; margin: 0 auto; }
+        
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-bottom: 4px solid #4F46E5;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+        }
+        .header-left { display: flex; align-items: center; gap: 0.75rem; }
+        .logo {
+            width: 3rem;
+            height: 3rem;
+            background: #4F46E5;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .title { font-size: 1.25rem; font-weight: 900; color: #111; }
+        .subtitle { font-size: 0.75rem; color: #6B7280; font-weight: 500; }
+        
+        /* Tabs */
+        .tabs {
+            background: white;
+            border-bottom: 4px solid #D1D5DB;
+            position: sticky;
+            top: 88px;
+            z-index: 30;
+        }
+        .tabs-content { display: flex; gap: 0.5rem; padding: 0.5rem; }
+        .tab {
+            flex: 1;
+            padding: 0.75rem 0.5rem;
+            border: 3px solid #D1D5DB;
+            border-radius: 0.75rem;
+            background: #F3F4F6;
+            color: #374151;
+            font-weight: 700;
+            font-size: 0.875rem;
+            text-align: center;
+        }
+        .tab.active {
+            background: #4F46E5;
+            color: white;
+            border-color: #3730A3;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        /* Content */
+        .content { padding: 1rem; padding-bottom: 6rem; }
+        .card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            border: 4px solid #D1D5DB;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        .card-body { padding: 1.5rem; }
+        
+        /* Camera */
+        .video-container {
+            position: relative;
+            height: 20rem;
+            background: linear-gradient(135deg, #E5E7EB, #D1D5DB);
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: black;
+        }
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        .crosshair-outer {
+            width: 6rem;
+            height: 6rem;
+            border: 8px solid black;
+            border-radius: 50%;
+        }
+        .crosshair-inner {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 8px solid white;
+            border-radius: 50%;
+        }
+        .instruction {
+            position: absolute;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: black;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            border: 4px solid white;
+            font-weight: 900;
+            pointer-events: none;
+        }
+        
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            font-weight: 900;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        .btn-primary {
+            background: #4F46E5;
+            color: white;
+            border: 4px solid #3730A3;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        .btn-success {
+            background: #10B981;
+            color: white;
+            border: 4px solid #059669;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        .btn-secondary {
+            background: #D1D5DB;
+            color: #1F2937;
+            border: 4px solid #9CA3AF;
+            padding: 0.75rem;
+            font-size: 1.125rem;
+        }
+        .btn-small {
+            padding: 0.75rem;
+            width: auto;
+            font-size: 1rem;
+            border-radius: 1rem;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Color Display */
+        .color-result {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .color-box {
+            width: 7rem;
+            height: 7rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            border: 4px solid #9CA3AF;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .color-info { flex: 1; }
+        .color-name {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #111;
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+        .color-hex {
+            font-family: monospace;
+            font-weight: 700;
+            background: #F3F4F6;
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+        
+        /* Patterns */
+        .pattern-dots {
+            background-image: radial-gradient(circle, rgba(255,255,255,0.3) 2px, transparent 2px);
+            background-size: 12px 12px;
+        }
+        .pattern-grid {
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px);
+            background-size: 10px 10px;
+        }
+        .pattern-diagonal {
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.2) 8px, rgba(255,255,255,0.2) 10px);
+        }
+        .pattern-vertical {
+            background-image: repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.2) 8px, rgba(255,255,255,0.2) 10px);
+        }
+        
+        /* Info boxes */
+        .info-box {
+            background: #DBEAFE;
+            border: 3px solid #3B82F6;
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+        }
+        .info-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #1E40AF;
+            margin-bottom: 0.25rem;
+        }
+        .info-value {
+            font-size: 1rem;
+            font-weight: 900;
+            color: #1E3A8A;
+        }
+        
+        /* History item */
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: #F9FAFB;
+            border-radius: 0.75rem;
+            border: 2px solid #D1D5DB;
+            margin-bottom: 0.5rem;
+        }
+        .history-box {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 0.75rem;
+            border: 3px solid #9CA3AF;
+            flex-shrink: 0;
+        }
+        .history-info { flex: 1; }
+        .history-name {
+            font-weight: 900;
+            font-size: 0.875rem;
+            color: #111;
+        }
+        .history-hex {
+            font-family: monospace;
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            max-width: 90%;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px rgba(0,0,0,0.15);
+            border: 4px solid #10B981;
+            padding: 1rem 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .notification.show {
+            display: flex;
+            animation: slideDown 0.3s ease;
+        }
+        @keyframes slideDown {
+            from { transform: translate(-50%, -100%); }
+            to { transform: translate(-50%, 0); }
+        }
+        .notification.error { border-color: #EF4444; }
+        .notif-icon {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background: #10B981;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+        .notification.error .notif-icon { background: #EF4444; }
+        .notif-text {
+            font-weight: 700;
+            color: #059669;
+        }
+        .notification.error .notif-text { color: #DC2626; }
+        
+        .hidden { display: none !important; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-top: 0.75rem; }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            border: 4px dashed #D1D5DB;
+        }
+        .empty-icon { font-size: 4rem; margin-bottom: 1rem; }
+        .space-y { margin-bottom: 0.75rem; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="logo">👁️</div>
+                    <div>
+                        <div class="title">ColorHelper</div>
+                        <div class="subtitle">Pentru daltonism</div>
+                    </div>
+                </div>
+                <button id="soundBtn" class="btn btn-small btn-secondary">🔊</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <div class="container">
+            <div class="tabs-content">
+                <button class="tab active" data-tab="camera">📷 Camera</button>
+                <button class="tab" data-tab="compare">🔄 Compară</button>
+                <button class="tab" data-tab="saved">⭐ Salvate</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container content">
+        <!-- Camera Tab -->
+        <div id="cameraTab">
+            <div class="card">
+                <div class="video-container">
+                    <div id="placeholderCamera" class="empty-state">
+                        <div class="empty-icon">📷</div>
+                        <p style="font-size: 1.125rem; font-weight: 900;">Apasă pentru camera</p>
+                    </div>
+                    <video id="video" class="hidden" autoplay playsinline muted></video>
+                    <div id="crosshair" class="crosshair hidden">
+                        <div class="crosshair-outer">
+                            <div class="crosshair-inner"></div>
+                        </div>
+                    </div>
+                    <div id="instruction" class="instruction hidden">Centrează ținta</div>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                </div>
+                <div class="card-body">
+                    <button id="startCameraBtn" class="btn btn-primary">📷 PORNEȘTE CAMERA</button>
+                    <div id="cameraControls" class="hidden">
+                        <button id="detectBtn" class="btn btn-success space-y">👁️ DETECTEAZĂ</button>
+                        <button id="stopCameraBtn" class="btn btn-secondary">OPREȘTE</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="detectedColorCard" class="card hidden">
+                <div class="card-body">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1.25rem; font-weight: 900;">Detectat</h3>
+                        <button id="saveColorBtn" class="btn btn-small" style="background: #FBBF24; border: 4px solid #D97706;">⭐</button>
+                    </div>
+                    <div class="color-result">
+                        <div id="detectedColorBox" class="color-box"></div>
+                        <div class="color-info">
+                            <div id="detectedColorName" class="color-name"></div>
+                            <div id="detectedColorHex" class="color-hex"></div>
+                        </div>
+                    </div>
+                    <div class="grid-2">
+                        <div class="info-box">
+                            <div class="info-label">CATEGORIE</div>
+                            <div id="detectedCategory" class="info-value"></div>
+                        </div>
+                        <div class="info-box">
+                            <div class="info-label">TEMP</div>
+                            <div id="detectedTemp" class="info-value"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="historyCard" class="card hidden">
+                <div class="card-body">
+                    <h3 style="font-size: 1.125rem; font-weight: 900; margin-bottom: 1rem;">📜 Istoric</h3>
+                    <div id="historyList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compare Tab -->
+        <div id="compareTab" class="hidden">
+            <div class="card" style="background: linear-gradient(135deg, #E9D5FF, #FBE8FF); border-color: #A855F7;">
+                <div class="card-body">
+                    <h2 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.5rem;">🔄 Comparare Culori</h2>
+                    <p style="font-size: 0.875rem; font-weight: 500;">Detectează 2 culori pentru a le compara</p>
+                </div>
+            </div>
+
+            <div id="compareEmpty" class="card">
+                <div class="empty-state">
+                    <div class="empty-icon">⚠️</div>
+                    <p id="compareEmptyText" style="font-size: 1.125rem; font-weight: 900; margin-bottom: 0.5rem;">Detectează prima culoare</p>
+                    <p style="font-size: 0.875rem; font-weight: 500;">Mergi la Camera</p>
+                </div>
+            </div>
+
+            <div id="compareList"></div>
+
+            <div id="compareResult" class="card hidden">
+                <div class="card-body">
+                    <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 1rem;">Rezultat</h3>
+                    <div class="info-box" style="background: #D1FAE5; border-color: #10B981;">
+                        <div id="compareResultText" class="info-value" style="color: #065F46; font-size: 1.125rem;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="resetCompareBtn" class="btn btn-secondary">🔄 RESETEAZĂ</button>
+        </div>
+
+        <!-- Saved Tab -->
+        <div id="savedTab" class="hidden">
+            <div id="savedEmpty" class="card">
+                <div class="empty-state">
+                    <div class="empty-icon">⭐</div>
+                    <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.5rem;">Nimic salvat</h3>
+                    <p>Apasă ⭐ la detectare</p>
+                </div>
+            </div>
+
+            <div id="savedList" class="card hidden">
+                <div class="card-body">
+                    <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 1rem;">Salvate (<span id="savedCount">0</span>)</h3>
+                    <div id="savedColors"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification" class="notification">
+        <div class="notif-icon">✓</div>
+        <span class="notif-text"></span>
+    </div>
+
+    <script>
+        // State
+        const state = {
+            currentTab: 'camera',
+            soundEnabled: true,
+            cameraStream: null,
+            detectedColor: null,
+            colorHistory: [],
+            savedColors: [],
+            compareMode: false,
+            compareColors: []
+        };
+
+        // Elements
+        const el = {
+            video: document.getElementById('video'),
+            canvas: document.getElementById('canvas'),
+            notification: document.getElementById('notification'),
+            tabs: document.querySelectorAll('.tab')
+        };
+
+        // Utility
+        function playSound(type = 'success') {
+            if (!state.soundEnabled) return;
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.frequency.value = type === 'success' ? 1000 : 600;
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            } catch(e) {}
+        }
+
+        function vibrate(type = 'success') {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(type === 'success' ? [50, 50, 100] : [50]);
+            }
+        }
+
+        function showNotification(msg, type = 'success') {
+            const notif = el.notification;
+            notif.querySelector('.notif-text').textContent = msg;
+            notif.querySelector('.notif-icon').textContent = type === 'success' ? '✓' : '✗';
+            notif.className = 'notification show' + (type === 'error' ? ' error' : '');
+            playSound(type);
+            vibrate(type);
+            setTimeout(() => notif.classList.remove('show'), 3000);
+        }
+
+        function rgbToHex(r, g, b) {
+            return '#' + [r, g, b].map(x => ('0' + x.toString(16)).slice(-2)).join('');
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function getColorName(r, g, b) {
+            const hsl = rgbToHsl(r, g, b);
+            if (hsl.s < 10) {
+                if (hsl.l > 95) return 'Alb';
+                if (hsl.l < 5) return 'Negru';
+                return 'Gri';
+            }
+            if (hsl.h < 30 || hsl.h > 330) return 'Roșu';
+            if (hsl.h < 75) return 'Galben';
+            if (hsl.h < 150) return 'Verde';
+            if (hsl.h < 260) return 'Albastru';
+            return 'Violet';
+        }
+
+        function getPattern(r, g, b) {
+            const hsl = rgbToHsl(r, g, b);
+            if (hsl.s < 10) return '';
+            if (hsl.h < 30 || hsl.h > 330) return 'pattern-dots';
+            if (hsl.h < 75) return 'pattern-grid';
+            if (hsl.h < 150) return 'pattern-diagonal';
+            return 'pattern-vertical';
+        }
+
+        function getCategory(r, g, b) {
+            const name = getColorName(r, g, b);
+            if (name === 'Gri' || name === 'Alb' || name === 'Negru') return 'Gri';
+            return name + 'e';
+        }
+
+        function getTemperature(r, g, b) {
+            if (r > b + 20) return 'Caldă';
+            if (b > r + 20) return 'Rece';
+            return 'Neutră';
+        }
+
+        // Camera
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+                });
+                el.video.srcObject = stream;
+                state.cameraStream = stream;
+                
+                document.getElementById('placeholderCamera').classList.add('hidden');
+                el.video.classList.remove('hidden');
+                document.getElementById('crosshair').classList.remove('hidden');
+                document.getElementById('instruction').classList.remove('hidden');
+                document.getElementById('startCameraBtn').classList.add('hidden');
+                document.getElementById('cameraControls').classList.remove('hidden');
+                
+                showNotification('Camera pornită');
+            } catch (err) {
+                showNotification('Nu pot accesa camera', 'error');
+            }
+        }
+
+        function stopCamera() {
+            if (state.cameraStream) {
+                state.cameraStream.getTracks().forEach(t => t.stop());
+                state.cameraStream = null;
+                el.video.srcObject = null;
+                
+                el.video.classList.add('hidden');
+                document.getElementById('crosshair').classList.add('hidden');
+                document.getElementById('instruction').classList.add('hidden');
+                document.getElementById('placeholderCamera').classList.remove('hidden');
+                document.getElementById('cameraControls').classList.add('hidden');
+                document.getElementById('startCameraBtn').classList.remove('hidden');
+            }
+        }
+
+        function detectColor() {
+            if (!el.video.videoWidth) return;
+            
+            const ctx = el.canvas.getContext('2d');
+            el.canvas.width = el.video.videoWidth;
+            el.canvas.height = el.video.videoHeight;
+            ctx.drawImage(el.video, 0, 0);
+            
+            const cx = Math.floor(el.canvas.width / 2);
+            const cy = Math.floor(el.canvas.height / 2);
+            let r = 0, g = 0, b = 0, count = 0;
+            
+            for (let dx = -8; dx <= 8; dx++) {
+                for (let dy = -8; dy <= 8; dy++) {
+                    const data = ctx.getImageData(cx + dx, cy + dy, 1, 1).data;
+                    r += data[0]; g += data[1]; b += data[2]; count++;
+                }
+            }
+            
+            r = Math.round(r / count);
+            g = Math.round(g / count);
+            b = Math.round(b / count);
+            
+            const color = {
+                r, g, b,
+                hex: rgbToHex(r, g, b),
+                name: getColorName(r, g, b),
+                pattern: getPattern(r, g, b),
+                category: getCategory(r, g, b),
+                temperature: getTemperature(r, g, b),
+                id: Date.now()
+            };
+            
+            state.detectedColor = color;
+            state.colorHistory.unshift(color);
+            state.colorHistory = state.colorHistory.slice(0, 10);
+            
+            if (state.compareMode && state.compareColors.length < 2) {
+                state.compareColors.push(color);
+                updateCompareTab();
+                if (state.compareColors.length === 2) {
+                    showNotification('Ambele culori!');
+                }
+            }
+            
+            updateDetectedColor();
+            updateHistory();
+            showNotification(`Detectat: ${color.name}`);
+        }
+
+        function updateDetectedColor() {
+            if (!state.detectedColor) return;
+            const c = state.detectedColor;
+            
+            document.getElementById('detectedColorBox').style.backgroundColor = c.hex;
+            document.getElementById('detectedColorBox').className = 'color-box ' + c.pattern;
+            document.getElementById('detectedColorName').textContent = c.name;
+            document.getElementById('detectedColorHex').textContent = c.hex;
+            document.getElementById('detectedCategory').textContent = c.category;
+            document.getElementById('detectedTemp').textContent = c.temperature;
+            document.getElementById('detectedColorCard').classList.remove('hidden');
+        }
+
+        function updateHistory() {
+            if (state.colorHistory.length === 0) return;
+            
+            const html = state.colorHistory.slice(0, 5).map((c, i) => `
+                <div class="history-item" data-history-index="${i}">
+                    <div class="history-box ${c.pattern}" style="background-color: ${c.hex}"></div>
+                    <div class="history-info">
+                        <div class="history-name">${c.name}</div>
+                        <div class="history-hex">${c.hex}</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('historyList').innerHTML = html;
+            document.getElementById('historyCard').classList.remove('hidden');
+            
+            // Add click handlers
+            document.querySelectorAll('[data-history-index]').forEach(el => {
+                el.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.historyIndex);
+                    state.detectedColor = state.colorHistory[idx];
+                    updateDetectedColor();
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            state.currentTab = tabName;
+            
+            el.tabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+            
+            document.getElementById('cameraTab').classList.toggle('hidden', tabName !== 'camera');
+            document.getElementById('compareTab').classList.toggle('hidden', tabName !== 'compare');
+            document.getElementById('savedTab').classList.toggle('hidden', tabName !== 'saved');
+            
+            if (tabName === 'compare') {
+                state.compareMode = true;
+                state.compareColors = [];
+                updateCompareTab();
+            } else {
+                state.compareMode = false;
+            }
+        }
+
+        function updateCompareTab() {
+            const empty = document.getElementById('compareEmpty');
+            const emptyText = document.getElementById('compareEmptyText');
+            const list = document.getElementById('compareList');
+            const result = document.getElementById('compareResult');
+            
+            if (state.compareColors.length === 0) {
+                emptyText.textContent = 'Detectează prima culoare';
+                empty.classList.remove('hidden');
+                list.innerHTML = '';
+                result.classList.add('hidden');
+            } else if (state.compareColors.length === 1) {
+                emptyText.textContent = 'Detectează a doua culoare';
+                const c = state.compareColors[0];
+                list.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div class="history-box ${c.pattern}" style="width: 5rem; height: 5rem; background-color: ${c.hex}"></div>
+                                <div>
+                                    <div style="font-weight: 900; font-size: 1rem;">Culoare 1</div>
+                                    <div style="font-weight: 700; font-size: 0.875rem;">${c.name}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                empty.classList.add('hidden');
+                list.innerHTML = state.compareColors.map((c, i) => `
+                    <div class="card">
+                        <div class="card-body">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div class="history-box ${c.pattern}" style="width: 5rem; height: 5rem; background-color: ${c.hex}"></div>
+                                <div>
+                                    <div style="font-weight: 900; font-size: 1rem;">Culoare ${i + 1}</div>
+                                    <div style="font-weight: 700; font-size: 0.875rem;">${c.name}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                const similar = state.compareColors[0].name === state.compareColors[1].name || 
+                               state.compareColors[0].category === state.compareColors[1].category;
+                
+                document.getElementById('compareResultText').textContent = 
+                    similar ? '⚠️ Culori foarte asemănătoare!' : '✓ Culori diferite!';
+                result.classList.remove('hidden');
+            }
+        }
+
+        function saveCurrentColor() {
+            if (!state.detectedColor) return;
+            if (state.savedColors.some(c => c.hex === state.detectedColor.hex)) {
+                showNotification('Deja salvată', 'error');
+                return;
+            }
+            state.savedColors.push(state.detectedColor);
+            updateSavedTab();
+            showNotification('Salvată!');
+        }
+
+        function updateSavedTab() {
+            const empty = document.getElementById('savedEmpty');
+            const list = document.getElementById('savedList');
+            
+            if (state.savedColors.length === 0) {
+                empty.classList.remove('hidden');
+                list.classList.add('hidden');
+            } else {
+                empty.classList.add('hidden');
+                list.classList.remove('hidden');
+                document.getElementById('savedCount').textContent = state.savedColors.length;
+                
+                const html = state.savedColors.map(c => `
+                    <div class="history-item">
+                        <div class="history-box ${c.pattern}" style="background-color: ${c.hex}"></div>
+                        <div class="history-info">
+                            <div class="history-name">${c.name}</div>
+                            <div class="history-hex">${c.hex}</div>
+                        </div>
+                        <button class="btn btn-small delete-color" data-color-id="${c.id}" style="background: #FEE2E2; border: 2px solid #EF4444; padding: 0.5rem; font-size: 1.25rem;">❌</button>
+                    </div>
+                `).join('');
+                
+                document.getElementById('savedColors').innerHTML = html;
+                
+                // Add delete handlers
+                document.querySelectorAll('.delete-color').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const id = parseInt(this.dataset.colorId);
+                        state.savedColors = state.savedColors.filter(c => c.id !== id);
+                        updateSavedTab();
+                        showNotification('Ștearsă');
+                    });
+                });
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('startCameraBtn').addEventListener('click', startCamera);
+        document.getElementById('stopCameraBtn').addEventListener('click', stopCamera);
+        document.getElementById('detectBtn').addEventListener('click', detectColor);
+        document.getElementById('saveColorBtn').addEventListener('click', saveCurrentColor);
+        document.getElementById('resetCompareBtn').addEventListener('click', () => {
+            state.compareColors = [];
+            updateCompareTab();
+            showNotification('Reset');
+        });
+
+        document.getElementById('soundBtn').addEventListener('click', function() {
+            state.soundEnabled = !state.soundEnabled;
+            this.textContent = state.soundEnabled ? '🔊' : '🔇';
+        });
+
+        el.tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                switchTab(this.dataset.tab);
+            });
+        });
+
+        // Initialize
+        updateSavedTab();
+        
+        console.log('ColorHelper loaded successfully!');
+    </script>
+</body>
+</html>
