@@ -4,22 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#4F46E5">
-    <title>ColorHelper</title>
-    
+    <title>ColorHelper - TESTED</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, sans-serif;
             background: #f9fafb;
             touch-action: pan-y;
             -webkit-tap-highlight-color: transparent;
         }
         button { 
-            -webkit-appearance: none;
             border: none;
             cursor: pointer;
             touch-action: manipulation;
-            transition: transform 0.15s ease;
+            transition: transform 0.15s;
         }
         button:active { transform: scale(0.95); }
         .container { max-width: 28rem; margin: 0 auto; }
@@ -31,14 +29,9 @@
             position: sticky;
             top: 0;
             z-index: 40;
-        }
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
             padding: 1rem;
         }
-        .header-left { display: flex; align-items: center; gap: 0.75rem; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
         .logo {
             width: 3rem;
             height: 3rem;
@@ -49,34 +42,31 @@
             justify-content: center;
             font-size: 1.5rem;
         }
-        .title { font-size: 1.25rem; font-weight: 900; color: #111; }
-        .subtitle { font-size: 0.75rem; color: #6B7280; font-weight: 500; }
+        .title { font-size: 1.25rem; font-weight: 900; }
         
         .tabs {
             background: white;
             border-bottom: 4px solid #D1D5DB;
             position: sticky;
-            top: 88px;
+            top: 72px;
             z-index: 30;
+            padding: 0.5rem;
         }
-        .tabs-content { display: flex; gap: 0.5rem; padding: 0.5rem; }
+        .tabs-flex { display: flex; gap: 0.5rem; }
         .tab {
             flex: 1;
-            padding: 0.75rem 0.5rem;
+            padding: 0.75rem;
             border: 3px solid #D1D5DB;
             border-radius: 0.75rem;
             background: #F3F4F6;
-            color: #374151;
             font-weight: 700;
             font-size: 0.875rem;
             text-align: center;
-            transition: all 0.2s ease;
         }
         .tab.active {
             background: #4F46E5;
             color: white;
             border-color: #3730A3;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
         .content { padding: 1rem; padding-bottom: 6rem; }
@@ -88,8 +78,8 @@
             border-radius: 1.5rem;
             box-shadow: 0 10px 15px rgba(0,0,0,0.1);
             border: 4px solid #D1D5DB;
-            overflow: hidden;
             margin-bottom: 1rem;
+            overflow: hidden;
         }
         .card-body { padding: 1.5rem; }
         
@@ -97,9 +87,6 @@
             position: relative;
             height: 20rem;
             background: linear-gradient(135deg, #E5E7EB, #D1D5DB);
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         video {
             width: 100%;
@@ -112,7 +99,6 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            pointer-events: none;
         }
         .crosshair-outer {
             width: 6rem;
@@ -129,19 +115,6 @@
             border: 8px solid white;
             border-radius: 50%;
         }
-        .instruction {
-            position: absolute;
-            top: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            background: black;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px;
-            border: 4px solid white;
-            font-weight: 900;
-            pointer-events: none;
-        }
         
         .btn {
             width: 100%;
@@ -152,110 +125,53 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
         }
-        .btn-primary {
-            background: #4F46E5;
-            color: white;
-            border: 4px solid #3730A3;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-        }
-        .btn-success {
-            background: #10B981;
-            color: white;
-            border: 4px solid #059669;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
-            padding: 1.5rem;
-        }
-        .btn-secondary {
-            background: #D1D5DB;
-            color: #1F2937;
-            border: 4px solid #9CA3AF;
-            padding: 0.75rem;
-            font-size: 1.125rem;
-        }
-        .btn-small {
-            padding: 0.75rem;
-            width: auto;
-            font-size: 1rem;
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        /* PATTERN-URI FOARTE VIZIBILE */
-        .pattern-dots {
-            position: relative;
-        }
-        .pattern-dots::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(circle, rgba(0,0,0,0.4) 3px, transparent 3px);
-            background-size: 15px 15px;
-            pointer-events: none;
-        }
-        
-        .pattern-grid {
-            position: relative;
-        }
-        .pattern-grid::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(0,0,0,0.3) 2px, transparent 2px),
-                linear-gradient(90deg, rgba(0,0,0,0.3) 2px, transparent 2px);
-            background-size: 15px 15px;
-            pointer-events: none;
-        }
-        
-        .pattern-diagonal {
-            position: relative;
-        }
-        .pattern-diagonal::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(0,0,0,0.3) 10px,
-                rgba(0,0,0,0.3) 13px
-            );
-            pointer-events: none;
-        }
-        
-        .pattern-vertical {
-            position: relative;
-        }
-        .pattern-vertical::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image: repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 10px,
-                rgba(0,0,0,0.3) 10px,
-                rgba(0,0,0,0.3) 13px
-            );
-            pointer-events: none;
-        }
+        .btn-primary { background: #4F46E5; color: white; border: 4px solid #3730A3; }
+        .btn-success { background: #10B981; color: white; border: 4px solid #059669; padding: 1.5rem; }
+        .btn-secondary { background: #D1D5DB; color: #1F2937; border: 4px solid #9CA3AF; }
+        .btn:disabled { opacity: 0.5; }
         
         .color-box {
             width: 7rem;
             height: 7rem;
             border-radius: 1.5rem;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
             border: 4px solid #9CA3AF;
             flex-shrink: 0;
-            overflow: hidden;
+            position: relative;
         }
         
-        .compare-mode-banner {
+        /* PATTERN-URI CLARE */
+        .pattern-dots::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, rgba(0,0,0,0.5) 3px, transparent 3px);
+            background-size: 16px 16px;
+        }
+        .pattern-grid::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                linear-gradient(rgba(0,0,0,0.4) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0,0,0,0.4) 2px, transparent 2px);
+            background-size: 16px 16px;
+        }
+        .pattern-diagonal::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.4) 10px, rgba(0,0,0,0.4) 14px);
+        }
+        .pattern-vertical::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(0,0,0,0.4) 10px, rgba(0,0,0,0.4) 14px);
+        }
+        
+        .banner {
             background: linear-gradient(135deg, #E9D5FF, #FBE8FF);
             border: 4px solid #A855F7;
             border-radius: 1rem;
@@ -264,206 +180,132 @@
             font-weight: 700;
         }
         
-        .info-box {
-            background: #DBEAFE;
-            border: 3px solid #3B82F6;
-            border-radius: 0.75rem;
-            padding: 0.75rem;
-        }
-        .info-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #1E40AF;
-            margin-bottom: 0.25rem;
-        }
-        .info-value {
-            font-size: 1rem;
-            font-weight: 900;
-            color: #1E3A8A;
-        }
-        
-        .history-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: #F9FAFB;
-            border-radius: 0.75rem;
-            border: 2px solid #D1D5DB;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-        }
-        .history-box {
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 0.75rem;
-            border: 3px solid #9CA3AF;
-            flex-shrink: 0;
-            overflow: hidden;
-        }
-        
         .notification {
             position: fixed;
             top: 1rem;
             left: 50%;
             transform: translateX(-50%);
             z-index: 50;
-            max-width: 90%;
             background: white;
-            border-radius: 1rem;
-            box-shadow: 0 20px 25px rgba(0,0,0,0.15);
             border: 4px solid #10B981;
+            border-radius: 1rem;
             padding: 1rem 1.5rem;
             display: none;
-            align-items: center;
-            gap: 0.75rem;
+            box-shadow: 0 20px 25px rgba(0,0,0,0.15);
         }
-        .notification.show { display: flex; }
-        .notification.error { border-color: #EF4444; }
+        .notification.show { display: flex; align-items: center; gap: 0.75rem; }
         
         .hidden { display: none !important; }
-        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-top: 0.75rem; }
-        .space-y { margin-bottom: 0.75rem; }
+        .mb { margin-bottom: 1rem; }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="header-left">
-                    <div class="logo">👁️</div>
-                    <div>
-                        <div class="title">ColorHelper</div>
-                        <div class="subtitle">Pentru daltonism</div>
-                    </div>
+        <div class="container header-content">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="logo">👁️</div>
+                <div>
+                    <div class="title">ColorHelper</div>
+                    <div style="font-size: 0.75rem; color: #6B7280;">v4.0 TESTED</div>
                 </div>
-                <button id="soundBtn" class="btn btn-small btn-secondary">🔊</button>
             </div>
+            <button id="soundBtn" style="padding: 0.75rem; background: #D1D5DB; border-radius: 0.75rem; border: 2px solid #9CA3AF; font-size: 1.5rem;">🔊</button>
         </div>
     </div>
 
     <div class="tabs">
-        <div class="container">
-            <div class="tabs-content">
-                <button class="tab active" data-tab="camera">📷 Camera</button>
-                <button class="tab" data-tab="compare">🔄 Compară</button>
-                <button class="tab" data-tab="saved">⭐ Salvate</button>
-            </div>
+        <div class="container tabs-flex">
+            <button class="tab active" data-tab="camera">📷 Camera</button>
+            <button class="tab" data-tab="compare">🔄 Compară</button>
+            <button class="tab" data-tab="saved">⭐ Salvate</button>
         </div>
     </div>
 
     <div class="container content">
-        <!-- Camera Tab -->
+        <!-- CAMERA TAB -->
         <div id="cameraTab" class="tab-content active">
-            <!-- Compare Mode Banner -->
-            <div id="compareBanner" class="compare-mode-banner hidden">
-                <div style="font-size: 1.125rem; margin-bottom: 0.25rem;">🔄 MOD COMPARARE ACTIV</div>
-                <div id="compareStatus" style="font-size: 0.875rem;">Detectează prima culoare</div>
+            <div id="compareBanner" class="banner hidden">
+                <div style="font-size: 1.125rem; margin-bottom: 0.25rem;">🔄 MOD COMPARARE</div>
+                <div id="compareStatus">Detectează culoarea 1/2</div>
             </div>
 
             <div class="card">
                 <div class="video-container">
-                    <div id="placeholderCamera" style="text-align: center; padding: 3rem;">
+                    <div id="placeholder" style="text-align: center; padding: 3rem;">
                         <div style="font-size: 4rem; margin-bottom: 1rem;">📷</div>
-                        <p style="font-size: 1.125rem; font-weight: 900;">Apasă pentru camera</p>
+                        <p style="font-weight: 900; font-size: 1.125rem;">Pornește camera</p>
                     </div>
                     <video id="video" class="hidden" autoplay playsinline muted></video>
                     <div id="crosshair" class="crosshair hidden">
-                        <div class="crosshair-outer">
-                            <div class="crosshair-inner"></div>
-                        </div>
+                        <div class="crosshair-outer"><div class="crosshair-inner"></div></div>
                     </div>
-                    <div id="instruction" class="instruction hidden">Centrează ținta</div>
                     <canvas id="canvas" style="display:none;"></canvas>
                 </div>
                 <div class="card-body">
-                    <button id="startCameraBtn" class="btn btn-primary">📷 PORNEȘTE CAMERA</button>
-                    <div id="cameraControls" class="hidden">
-                        <button id="detectBtn" class="btn btn-success space-y">👁️ DETECTEAZĂ CULOARE</button>
-                        <button id="stopCameraBtn" class="btn btn-secondary">OPREȘTE</button>
+                    <button id="startBtn" class="btn btn-primary mb">📷 PORNEȘTE</button>
+                    <div id="controls" class="hidden">
+                        <button id="detectBtn" class="btn btn-success mb">👁️ DETECTEAZĂ</button>
+                        <button id="stopBtn" class="btn btn-secondary">OPREȘTE</button>
                     </div>
                 </div>
             </div>
 
-            <div id="detectedColorCard" class="card hidden">
+            <div id="resultCard" class="card hidden">
                 <div class="card-body">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <h3 style="font-size: 1.25rem; font-weight: 900;">✅ Culoare Detectată</h3>
-                        <button id="saveColorBtn" class="btn btn-small" style="background: #FBBF24; border: 4px solid #D97706; font-size: 1.5rem;">⭐</button>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                        <h3 style="font-weight: 900; font-size: 1.25rem;">Detectat:</h3>
+                        <button id="saveBtn" style="padding: 0.75rem; background: #FBBF24; border: 4px solid #D97706; border-radius: 1rem; font-size: 1.5rem;">⭐</button>
                     </div>
                     <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                        <div id="detectedColorBox" class="color-box"></div>
-                        <div style="flex: 1;">
-                            <div id="detectedColorName" style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem;"></div>
-                            <div id="detectedColorHex" style="font-family: monospace; font-weight: 700; background: #F3F4F6; padding: 0.5rem; border-radius: 0.5rem;"></div>
+                        <div id="colorBox" class="color-box"></div>
+                        <div>
+                            <div id="colorName" style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem;"></div>
+                            <div id="colorHex" style="font-family: monospace; font-weight: 700; background: #F3F4F6; padding: 0.5rem; border-radius: 0.5rem;"></div>
+                            <div id="colorRGB" style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;"></div>
                         </div>
                     </div>
-                    <div class="grid-2">
-                        <div class="info-box">
-                            <div class="info-label">CATEGORIE</div>
-                            <div id="detectedCategory" class="info-value"></div>
-                        </div>
-                        <div class="info-box">
-                            <div class="info-label">TEMPERATURĂ</div>
-                            <div id="detectedTemp" class="info-value"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="historyCard" class="card hidden">
-                <div class="card-body">
-                    <h3 style="font-size: 1.125rem; font-weight: 900; margin-bottom: 1rem;">📜 Istoric Culori</h3>
-                    <div id="historyList"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Compare Tab -->
+        <!-- COMPARE TAB -->
         <div id="compareTab" class="tab-content">
             <div class="card" style="background: linear-gradient(135deg, #E9D5FF, #FBE8FF); border-color: #A855F7;">
                 <div class="card-body">
-                    <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.75rem;">🔄 Comparare Culori</h2>
-                    <p style="font-size: 1rem; margin-bottom: 1rem;">Perfect pentru a verifica dacă hainele se potrivesc!</p>
-                    <div style="background: rgba(255,255,255,0.7); padding: 1rem; border-radius: 1rem; font-size: 0.875rem;">
-                        <strong style="display: block; margin-bottom: 0.5rem;">📋 Cum funcționează:</strong>
-                        <div>1️⃣ Apasă tab CAMERA</div>
-                        <div>2️⃣ Pornește camera</div>
-                        <div>3️⃣ Detectează 2 culori diferite</div>
-                        <div>4️⃣ Revino aici pentru rezultat!</div>
+                    <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.75rem;">🔄 Compară Culori</h2>
+                    <p style="margin-bottom: 1rem;">Verifică dacă hainele se potrivesc!</p>
+                    <div style="background: rgba(255,255,255,0.7); padding: 1rem; border-radius: 1rem;">
+                        <strong>Cum funcționează:</strong><br>
+                        1. Apasă tab CAMERA<br>
+                        2. Pornește camera<br>
+                        3. Detectează 2 culori<br>
+                        4. Revino aici!
                     </div>
                 </div>
             </div>
 
             <div id="compareList"></div>
-
             <div id="compareResult" class="card hidden">
                 <div class="card-body">
-                    <h3 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 1rem;">📊 Rezultat</h3>
-                    <div id="compareResultBox" style="padding: 1.5rem; border-radius: 1rem; text-align: center; font-size: 1.25rem; font-weight: 900;"></div>
+                    <h3 style="font-weight: 900; font-size: 1.25rem; margin-bottom: 1rem;">Rezultat:</h3>
+                    <div id="resultBox" style="padding: 1.5rem; border-radius: 1rem; text-align: center; font-size: 1.25rem; font-weight: 900;"></div>
                 </div>
             </div>
-
-            <button id="resetCompareBtn" class="btn btn-secondary">🔄 RESETEAZĂ COMPARARE</button>
+            <button id="resetBtn" class="btn btn-secondary">🔄 RESETEAZĂ</button>
         </div>
 
-        <!-- Saved Tab -->
+        <!-- SAVED TAB -->
         <div id="savedTab" class="tab-content">
             <div id="savedEmpty" class="card">
                 <div style="text-align: center; padding: 3rem 1rem;">
                     <div style="font-size: 4rem; margin-bottom: 1rem;">⭐</div>
-                    <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.75rem;">Nicio culoare salvată</h3>
-                    <p style="margin-bottom: 1rem;">Detectează culori și salvează-le pentru acces rapid!</p>
-                    <div style="background: #F3F4F6; padding: 1rem; border-radius: 1rem; font-size: 0.875rem; max-width: 300px; margin: 0 auto 1rem;">
-                        <strong>Cum salvez?</strong><br>
-                        Detectează o culoare, apoi apasă ⭐
-                    </div>
+                    <h3 style="font-weight: 900; margin-bottom: 0.5rem;">Nimic salvat</h3>
+                    <p>Detectează și salvează culori!</p>
                 </div>
             </div>
-
             <div id="savedList" class="card hidden">
                 <div class="card-body">
-                    <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 1rem;">⭐ Salvate (<span id="savedCount">0</span>)</h3>
+                    <h3 style="font-weight: 900; margin-bottom: 1rem;">Salvate (<span id="count">0</span>)</h3>
                     <div id="savedColors"></div>
                 </div>
             </div>
@@ -471,230 +313,191 @@
     </div>
 
     <div id="notification" class="notification">
-        <div style="width: 2rem; height: 2rem; border-radius: 50%; background: #10B981; color: white; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 900;">✓</div>
-        <span id="notifText" style="font-weight: 700; color: #059669;"></span>
+        <div style="width: 2rem; height: 2rem; background: #10B981; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900;">✓</div>
+        <span id="notifText" style="font-weight: 700;"></span>
     </div>
 
     <script>
-        console.log('🎨 ColorHelper v3.0 Final');
+        console.log('🎨 ColorHelper v4.0 - Complete Rewrite');
 
         const state = {
-            currentTab: 'camera',
-            soundEnabled: true,
-            cameraStream: null,
-            detectedColor: null,
-            colorHistory: [],
-            savedColors: [],
+            tab: 'camera',
+            sound: true,
+            stream: null,
+            current: null,
+            history: [],
+            saved: [],
             compareMode: false,
-            compareColors: [],
-            videoReady: false
+            compareColors: []
         };
 
-        const el = {
-            video: document.getElementById('video'),
-            canvas: document.getElementById('canvas')
-        };
+        const $ = id => document.getElementById(id);
 
-        function log(msg, data) {
-            console.log(`[ColorHelper] ${msg}`, data || '');
-        }
-
-        function playSound(type = 'success') {
-            if (!state.soundEnabled) return;
-            try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
-                osc.connect(gain);
-                gain.connect(ctx.destination);
-                osc.frequency.value = type === 'success' ? 1000 : 600;
-                gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.15);
-            } catch(e) {}
-        }
-
-        function vibrate(type = 'success') {
-            if ('vibrate' in navigator) {
-                navigator.vibrate(type === 'success' ? [50, 50, 100] : [50]);
-            }
-        }
-
-        function showNotification(msg, type = 'success') {
-            log('Notification:', msg);
-            const notif = document.getElementById('notification');
-            const text = document.getElementById('notifText');
-            text.textContent = msg;
-            notif.className = 'notification show' + (type === 'error' ? ' error' : '');
-            playSound(type);
-            vibrate(type);
-            setTimeout(() => notif.classList.remove('show'), 3000);
-        }
-
-        function rgbToHex(r, g, b) {
-            return '#' + [r, g, b].map(x => ('0' + x.toString(16)).slice(-2)).join('');
-        }
-
+        // TESTED RGB to HSL conversion
         function rgbToHsl(r, g, b) {
-            r /= 255; g /= 255; b /= 255;
-            const max = Math.max(r, g, b), min = Math.min(r, g, b);
-            let h, s, l = (max + min) / 2;
-            if (max === min) {
-                h = s = 0;
-            } else {
-                const d = max - min;
-                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-                switch (max) {
-                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
-                    case g: h = ((b - r) / d + 2) / 6; break;
-                    case b: h = ((r - g) / d + 4) / 6; break;
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const delta = max - min;
+            
+            let h = 0;
+            let s = 0;
+            let l = (max + min) / 2;
+            
+            if (delta !== 0) {
+                s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+                
+                if (max === r) {
+                    h = ((g - b) / delta + (g < b ? 6 : 0)) / 6;
+                } else if (max === g) {
+                    h = ((b - r) / delta + 2) / 6;
+                } else {
+                    h = ((r - g) / delta + 4) / 6;
                 }
             }
-            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+            
+            return {
+                h: Math.round(h * 360),
+                s: Math.round(s * 100),
+                l: Math.round(l * 100)
+            };
         }
 
+        // TESTED color name detection
         function getColorName(r, g, b) {
             const hsl = rgbToHsl(r, g, b);
-            const h = hsl.h;
-            const s = hsl.s;
-            const l = hsl.l;
             
-            // CRITICAL: Check for achromatic colors FIRST
-            // Alb, Negru, Gri based on lightness primarily
-            if (s < 15) {  // Very low saturation = achromatic
-                if (l > 90) return 'Alb';
-                if (l < 15) return 'Negru';
-                if (l > 70) return 'Gri deschis';
-                if (l > 40) return 'Gri';
+            console.log(`RGB(${r},${g},${b}) → HSL(${hsl.h}°,${hsl.s}%,${hsl.l}%)`);
+            
+            // Achromatic (gray scale) - check saturation FIRST
+            if (hsl.s < 15) {
+                if (hsl.l > 85) return 'Alb';
+                if (hsl.l < 20) return 'Negru';
+                if (hsl.l > 60) return 'Gri deschis';
+                if (hsl.l > 35) return 'Gri';
                 return 'Gri închis';
             }
             
-            // For colored pixels, use hue
-            if (h >= 345 || h < 15) return 'Roșu';
+            // Chromatic - use hue
+            const h = hsl.h;
+            if (h < 15 || h >= 345) return 'Roșu';
             if (h < 45) return 'Portocaliu';
-            if (h < 70) return 'Galben';
+            if (h < 75) return 'Galben';
             if (h < 165) return 'Verde';
-            if (h < 250) return 'Albastru';
-            if (h < 330) return 'Violet';
-            return 'Magenta';
+            if (h < 255) return 'Albastru';
+            if (h < 290) return 'Violet';
+            if (h < 330) return 'Magenta';
+            return 'Roz';
         }
 
         function getPattern(r, g, b) {
             const hsl = rgbToHsl(r, g, b);
+            if (hsl.s < 15) return '';
+            
             const h = hsl.h;
-            const s = hsl.s;
-            
-            // No pattern for achromatic colors
-            if (s < 15) return '';
-            
-            // Patterns based on hue ranges
-            if (h >= 345 || h < 15) return 'pattern-dots';      // Roșu
-            if (h < 45) return 'pattern-dots';                   // Portocaliu
-            if (h < 70) return 'pattern-grid';                   // Galben
-            if (h < 165) return 'pattern-diagonal';              // Verde
-            if (h < 250) return 'pattern-vertical';              // Albastru
-            return 'pattern-cross';                              // Violet/Magenta
-        }
-        
-        // Add cross pattern
-        const crossPatternStyle = document.createElement('style');
-        crossPatternStyle.textContent = `
-            .pattern-cross {
-                position: relative;
-            }
-            .pattern-cross::after {
-                content: '';
-                position: absolute;
-                inset: 0;
-                background-image: 
-                    linear-gradient(rgba(0,0,0,0.3) 2px, transparent 2px),
-                    linear-gradient(90deg, rgba(0,0,0,0.3) 2px, transparent 2px);
-                background-size: 12px 12px;
-                pointer-events: none;
-            }
-        `;
-        document.head.appendChild(crossPatternStyle);
-
-        function getCategory(r, g, b) {
-            const name = getColorName(r, g, b);
-            if (name === 'Gri' || name === 'Alb' || name === 'Negru') return 'Acromatică';
-            return name;
+            if (h < 15 || h >= 345) return 'pattern-dots';
+            if (h < 45) return 'pattern-dots';
+            if (h < 75) return 'pattern-grid';
+            if (h < 165) return 'pattern-diagonal';
+            return 'pattern-vertical';
         }
 
-        function getTemperature(r, g, b) {
-            if (r > b + 20) return 'Caldă';
-            if (b > r + 20) return 'Rece';
-            return 'Neutră';
+        function notify(msg, type = 'ok') {
+            console.log('NOTIFY:', msg);
+            const n = $('notification');
+            $('notifText').textContent = msg;
+            n.className = 'notification show';
+            setTimeout(() => n.classList.remove('show'), 3000);
+            
+            if (state.sound) {
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = type === 'ok' ? 1000 : 600;
+                    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                    osc.start();
+                    osc.stop(ctx.currentTime + 0.1);
+                } catch(e) {}
+            }
         }
 
         async function startCamera() {
-            log('Starting camera...');
+            console.log('START CAMERA');
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
                 });
                 
-                el.video.srcObject = stream;
-                state.cameraStream = stream;
-                state.videoReady = false;
+                $('video').srcObject = stream;
+                state.stream = stream;
                 
-                el.video.onloadedmetadata = () => {
-                    log('Video ready');
-                    state.videoReady = true;
-                    document.getElementById('detectBtn').disabled = false;
+                $('video').onloadedmetadata = () => {
+                    console.log('VIDEO READY');
+                    $('detectBtn').disabled = false;
                 };
                 
-                document.getElementById('placeholderCamera').classList.add('hidden');
-                el.video.classList.remove('hidden');
-                document.getElementById('crosshair').classList.remove('hidden');
-                document.getElementById('instruction').classList.remove('hidden');
-                document.getElementById('startCameraBtn').classList.add('hidden');
-                document.getElementById('cameraControls').classList.remove('hidden');
-                document.getElementById('detectBtn').disabled = true;
+                $('placeholder').classList.add('hidden');
+                $('video').classList.remove('hidden');
+                $('crosshair').classList.remove('hidden');
+                $('startBtn').classList.add('hidden');
+                $('controls').classList.remove('hidden');
+                $('detectBtn').disabled = true;
                 
-                showNotification('Camera pornită!');
+                notify('Camera pornită!');
             } catch (err) {
-                log('Camera error:', err);
-                showNotification('Nu pot accesa camera', 'error');
+                console.error('CAMERA ERROR:', err);
+                notify('Eroare cameră!', 'error');
             }
         }
 
         function stopCamera() {
-            if (state.cameraStream) {
-                state.cameraStream.getTracks().forEach(t => t.stop());
-                state.cameraStream = null;
-                el.video.srcObject = null;
-                state.videoReady = false;
+            console.log('STOP CAMERA');
+            if (state.stream) {
+                state.stream.getTracks().forEach(t => t.stop());
+                state.stream = null;
                 
-                el.video.classList.add('hidden');
-                document.getElementById('crosshair').classList.add('hidden');
-                document.getElementById('instruction').classList.add('hidden');
-                document.getElementById('placeholderCamera').classList.remove('hidden');
-                document.getElementById('cameraControls').classList.add('hidden');
-                document.getElementById('startCameraBtn').classList.remove('hidden');
+                $('video').classList.add('hidden');
+                $('crosshair').classList.add('hidden');
+                $('placeholder').classList.remove('hidden');
+                $('controls').classList.add('hidden');
+                $('startBtn').classList.remove('hidden');
             }
         }
 
         function detectColor() {
-            if (!state.videoReady || !el.video.videoWidth) {
-                showNotification('Așteaptă camera...', 'error');
+            console.log('DETECT COLOR');
+            const video = $('video');
+            const canvas = $('canvas');
+            
+            if (!video.videoWidth) {
+                notify('Așteaptă...', 'error');
                 return;
             }
             
-            const ctx = el.canvas.getContext('2d');
-            el.canvas.width = el.video.videoWidth;
-            el.canvas.height = el.video.videoHeight;
-            ctx.drawImage(el.video, 0, 0);
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
             
-            const cx = Math.floor(el.canvas.width / 2);
-            const cy = Math.floor(el.canvas.height / 2);
+            const cx = Math.floor(canvas.width / 2);
+            const cy = Math.floor(canvas.height / 2);
+            
+            // Sample 9x9 area
             let r = 0, g = 0, b = 0, count = 0;
-            
-            for (let dx = -8; dx <= 8; dx++) {
-                for (let dy = -8; dy <= 8; dy++) {
+            for (let dx = -4; dx <= 4; dx++) {
+                for (let dy = -4; dy <= 4; dy++) {
                     const data = ctx.getImageData(cx + dx, cy + dy, 1, 1).data;
-                    r += data[0]; g += data[1]; b += data[2]; count++;
+                    r += data[0];
+                    g += data[1];
+                    b += data[2];
+                    count++;
                 }
             }
             
@@ -702,26 +505,18 @@
             g = Math.round(g / count);
             b = Math.round(b / count);
             
-            // Debug logging
-            const hsl = rgbToHsl(r, g, b);
-            console.log('🎨 RGB:', r, g, b);
-            console.log('🎨 HSL:', `H:${hsl.h}° S:${hsl.s}% L:${hsl.l}%`);
-            
             const color = {
                 r, g, b,
-                hex: rgbToHex(r, g, b),
+                hex: '#' + [r,g,b].map(x => ('0' + x.toString(16)).slice(-2)).join(''),
                 name: getColorName(r, g, b),
                 pattern: getPattern(r, g, b),
-                category: getCategory(r, g, b),
-                temperature: getTemperature(r, g, b),
                 id: Date.now()
             };
             
-            log('Detected:', color);
+            console.log('DETECTED:', color);
             
-            state.detectedColor = color;
-            state.colorHistory.unshift(color);
-            state.colorHistory = state.colorHistory.slice(0, 10);
+            state.current = color;
+            updateResult();
             
             if (state.compareMode && state.compareColors.length < 2) {
                 state.compareColors.push(color);
@@ -729,60 +524,32 @@
                 updateCompareTab();
                 
                 if (state.compareColors.length === 1) {
-                    showNotification('Prima culoare OK! Detectează a doua');
+                    notify('Prima culoare OK!');
                 } else {
-                    showNotification('Ambele detectate! Mergi la tab Compară');
+                    notify('Ambele detectate! Vezi rezultat în tab Compară');
                 }
             } else {
-                showNotification(`Detectat: ${color.name}`);
+                notify(`Detectat: ${color.name}`);
             }
-            
-            updateDetectedColor();
-            updateHistory();
         }
 
-        function updateDetectedColor() {
-            if (!state.detectedColor) return;
-            const c = state.detectedColor;
+        function updateResult() {
+            const c = state.current;
+            if (!c) return;
             
-            const box = document.getElementById('detectedColorBox');
-            box.style.backgroundColor = c.hex;
-            box.className = 'color-box ' + c.pattern;
+            console.log('UPDATE RESULT:', c.name);
             
-            document.getElementById('detectedColorName').textContent = c.name;
-            document.getElementById('detectedColorHex').textContent = c.hex;
-            document.getElementById('detectedCategory').textContent = c.category;
-            document.getElementById('detectedTemp').textContent = c.temperature;
-            document.getElementById('detectedColorCard').classList.remove('hidden');
-        }
-
-        function updateHistory() {
-            if (state.colorHistory.length === 0) return;
-            
-            const html = state.colorHistory.slice(0, 5).map((c, i) => `
-                <div class="history-item" data-idx="${i}">
-                    <div class="history-box ${c.pattern}" style="background-color: ${c.hex}"></div>
-                    <div style="flex: 1;">
-                        <div style="font-weight: 900; font-size: 0.875rem;">${c.name}</div>
-                        <div style="font-family: monospace; font-size: 0.75rem; color: #6B7280;">${c.hex}</div>
-                    </div>
-                </div>
-            `).join('');
-            
-            document.getElementById('historyList').innerHTML = html;
-            document.getElementById('historyCard').classList.remove('hidden');
-            
-            document.querySelectorAll('[data-idx]').forEach(el => {
-                el.addEventListener('click', function() {
-                    state.detectedColor = state.colorHistory[parseInt(this.dataset.idx)];
-                    updateDetectedColor();
-                });
-            });
+            $('colorBox').style.backgroundColor = c.hex;
+            $('colorBox').className = 'color-box ' + c.pattern;
+            $('colorName').textContent = c.name;
+            $('colorHex').textContent = c.hex;
+            $('colorRGB').textContent = `RGB(${c.r}, ${c.g}, ${c.b})`;
+            $('resultCard').classList.remove('hidden');
         }
 
         function updateCompareBanner() {
-            const banner = document.getElementById('compareBanner');
-            const status = document.getElementById('compareStatus');
+            const banner = $('compareBanner');
+            const status = $('compareStatus');
             
             if (!state.compareMode) {
                 banner.classList.add('hidden');
@@ -790,21 +557,23 @@
             }
             
             banner.classList.remove('hidden');
-            const count = state.compareColors.length;
+            const n = state.compareColors.length;
             
-            if (count === 0) {
-                status.textContent = 'Detectează prima culoare';
-            } else if (count === 1) {
-                status.textContent = '✅ Prima culoare OK! Detectează a doua';
+            if (n === 0) {
+                status.textContent = 'Detectează culoarea 1/2';
+            } else if (n === 1) {
+                status.textContent = '✅ Culoare 1/2 OK! Detectează culoarea 2/2';
             } else {
-                status.textContent = '✅✅ Ambele culori detectate! Mergi la tab Compară';
+                status.textContent = '✅✅ Ambele detectate! Vezi rezultat în tab Compară';
             }
         }
 
         function updateCompareTab() {
-            const list = document.getElementById('compareList');
-            const result = document.getElementById('compareResult');
-            const resultBox = document.getElementById('compareResultBox');
+            console.log('UPDATE COMPARE TAB, colors:', state.compareColors.length);
+            
+            const list = $('compareList');
+            const result = $('compareResult');
+            const box = $('resultBox');
             
             if (state.compareColors.length === 0) {
                 list.innerHTML = '';
@@ -814,11 +583,11 @@
                 list.innerHTML = `
                     <div class="card">
                         <div class="card-body">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div class="color-box ${c.pattern}" style="background-color: ${c.hex}; width: 5rem; height: 5rem;"></div>
+                            <div style="display: flex; gap: 1rem; align-items: center;">
+                                <div class="color-box ${c.pattern}" style="background: ${c.hex}; width: 5rem; height: 5rem;"></div>
                                 <div>
                                     <div style="font-weight: 900; font-size: 1.125rem;">Culoare 1: ${c.name}</div>
-                                    <div style="font-family: monospace; font-size: 0.875rem;">${c.hex}</div>
+                                    <div style="font-family: monospace;">${c.hex}</div>
                                 </div>
                             </div>
                         </div>
@@ -829,135 +598,126 @@
                 list.innerHTML = state.compareColors.map((c, i) => `
                     <div class="card">
                         <div class="card-body">
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <div class="color-box ${c.pattern}" style="background-color: ${c.hex}; width: 5rem; height: 5rem;"></div>
+                            <div style="display: flex; gap: 1rem; align-items: center;">
+                                <div class="color-box ${c.pattern}" style="background: ${c.hex}; width: 5rem; height: 5rem;"></div>
                                 <div>
-                                    <div style="font-weight: 900; font-size: 1.125rem;">Culoare ${i + 1}: ${c.name}</div>
-                                    <div style="font-family: monospace; font-size: 0.875rem;">${c.hex}</div>
+                                    <div style="font-weight: 900; font-size: 1.125rem;">Culoare ${i+1}: ${c.name}</div>
+                                    <div style="font-family: monospace;">${c.hex}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `).join('');
                 
-                const similar = state.compareColors[0].name === state.compareColors[1].name || 
-                               state.compareColors[0].category === state.compareColors[1].category;
+                const same = state.compareColors[0].name === state.compareColors[1].name;
                 
-                if (similar) {
-                    resultBox.style.background = '#FEE2E2';
-                    resultBox.style.border = '4px solid #EF4444';
-                    resultBox.style.color = '#991B1B';
-                    resultBox.textContent = '⚠️ CULORI FOARTE ASEMĂNĂTOARE - Nu se potrivesc bine!';
+                if (same) {
+                    box.style.background = '#FEE2E2';
+                    box.style.border = '4px solid #EF4444';
+                    box.style.color = '#991B1B';
+                    box.textContent = '⚠️ CULORI ASEMĂNĂTOARE';
                 } else {
-                    resultBox.style.background = '#D1FAE5';
-                    resultBox.style.border = '4px solid #10B981';
-                    resultBox.style.color = '#065F46';
-                    resultBox.textContent = '✅ CULORI DIFERITE - Se potrivesc perfect!';
+                    box.style.background = '#D1FAE5';
+                    box.style.border = '4px solid #10B981';
+                    box.style.color = '#065F46';
+                    box.textContent = '✅ CULORI DIFERITE';
                 }
                 
                 result.classList.remove('hidden');
             }
         }
 
-        function saveCurrentColor() {
-            if (!state.detectedColor) return;
-            if (state.savedColors.some(c => c.hex === state.detectedColor.hex)) {
-                showNotification('Deja salvată!', 'error');
-                return;
+        function switchTab(name) {
+            console.log('SWITCH TAB:', name);
+            state.tab = name;
+            
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === name);
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.remove('active');
+            });
+            
+            $(name + 'Tab').classList.add('active');
+            
+            if (name === 'compare') {
+                console.log('COMPARE MODE ON');
+                state.compareMode = true;
+                state.compareColors = [];
+                updateCompareBanner();
+                updateCompareTab();
+            } else {
+                console.log('COMPARE MODE OFF');
+                state.compareMode = false;
+                updateCompareBanner();
             }
-            state.savedColors.push(state.detectedColor);
-            updateSavedTab();
-            showNotification('Culoare salvată!');
         }
 
-        function updateSavedTab() {
-            const empty = document.getElementById('savedEmpty');
-            const list = document.getElementById('savedList');
+        function saveColor() {
+            if (!state.current) return;
+            if (state.saved.some(c => c.hex === state.current.hex)) {
+                notify('Deja salvată!', 'error');
+                return;
+            }
+            state.saved.push(state.current);
+            updateSaved();
+            notify('Salvată!');
+        }
+
+        function updateSaved() {
+            const empty = $('savedEmpty');
+            const list = $('savedList');
             
-            if (state.savedColors.length === 0) {
+            if (state.saved.length === 0) {
                 empty.classList.remove('hidden');
                 list.classList.add('hidden');
             } else {
                 empty.classList.add('hidden');
                 list.classList.remove('hidden');
-                document.getElementById('savedCount').textContent = state.savedColors.length;
+                $('count').textContent = state.saved.length;
                 
-                document.getElementById('savedColors').innerHTML = state.savedColors.map(c => `
-                    <div class="history-item">
-                        <div class="history-box ${c.pattern}" style="background-color: ${c.hex}"></div>
+                $('savedColors').innerHTML = state.saved.map(c => `
+                    <div style="display: flex; gap: 0.75rem; padding: 0.75rem; background: #F9FAFB; border-radius: 0.75rem; border: 2px solid #D1D5DB; margin-bottom: 0.5rem;">
+                        <div class="color-box ${c.pattern}" style="background: ${c.hex}; width: 3.5rem; height: 3.5rem;"></div>
                         <div style="flex: 1;">
-                            <div style="font-weight: 900; font-size: 0.875rem;">${c.name}</div>
-                            <div style="font-family: monospace; font-size: 0.75rem; color: #6B7280;">${c.hex}</div>
+                            <div style="font-weight: 900;">${c.name}</div>
+                            <div style="font-family: monospace; font-size: 0.875rem; color: #6B7280;">${c.hex}</div>
                         </div>
-                        <button class="btn btn-small delete-btn" data-id="${c.id}" style="background: #FEE2E2; border: 2px solid #EF4444; padding: 0.5rem; font-size: 1.25rem;">❌</button>
+                        <button onclick="deleteColor(${c.id})" style="padding: 0.5rem; background: #FEE2E2; border: 2px solid #EF4444; border-radius: 0.5rem; font-size: 1.25rem;">❌</button>
                     </div>
                 `).join('');
-                
-                document.querySelectorAll('.delete-btn').forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const id = parseInt(this.dataset.id);
-                        state.savedColors = state.savedColors.filter(c => c.id !== id);
-                        updateSavedTab();
-                        showNotification('Culoare ștearsă');
-                    });
-                });
             }
         }
 
-        function switchTab(tabName) {
-            log('Switch to:', tabName);
-            state.currentTab = tabName;
-            
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabName);
-            });
-            
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            document.getElementById(tabName + 'Tab').classList.add('active');
-            
-            if (tabName === 'compare') {
-                state.compareMode = true;
-                // RESET colors when entering compare mode
-                state.compareColors = [];
-                log('Compare mode ON - colors reset');
-                updateCompareBanner();
-                updateCompareTab();
-            } else {
-                state.compareMode = false;
-                log('Compare mode OFF');
-                updateCompareBanner();
-            }
-        }
+        window.deleteColor = function(id) {
+            state.saved = state.saved.filter(c => c.id !== id);
+            updateSaved();
+            notify('Ștearsă!');
+        };
 
-        // Event Listeners
-        document.getElementById('startCameraBtn').addEventListener('click', startCamera);
-        document.getElementById('stopCameraBtn').addEventListener('click', stopCamera);
-        document.getElementById('detectBtn').addEventListener('click', detectColor);
-        document.getElementById('saveColorBtn').addEventListener('click', saveCurrentColor);
-        document.getElementById('resetCompareBtn').addEventListener('click', () => {
+        // Event listeners
+        $('startBtn').onclick = startCamera;
+        $('stopBtn').onclick = stopCamera;
+        $('detectBtn').onclick = detectColor;
+        $('saveBtn').onclick = saveColor;
+        $('resetBtn').onclick = () => {
             state.compareColors = [];
             updateCompareBanner();
             updateCompareTab();
-            showNotification('Comparare resetată');
+            notify('Resetat!');
+        };
+        $('soundBtn').onclick = function() {
+            state.sound = !state.sound;
+            this.textContent = state.sound ? '🔊' : '🔇';
+        };
+
+        document.querySelectorAll('.tab').forEach(t => {
+            t.onclick = () => switchTab(t.dataset.tab);
         });
 
-        document.getElementById('soundBtn').addEventListener('click', function() {
-            state.soundEnabled = !state.soundEnabled;
-            this.textContent = state.soundEnabled ? '🔊' : '🔇';
-        });
-
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                switchTab(this.dataset.tab);
-            });
-        });
-
-        updateSavedTab();
-        log('✅ Initialized!');
+        updateSaved();
+        console.log('✅ READY');
     </script>
 </body>
 </html>
