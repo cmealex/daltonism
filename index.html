@@ -556,26 +556,65 @@
 
         function getColorName(r, g, b) {
             const hsl = rgbToHsl(r, g, b);
-            if (hsl.s < 10) {
-                if (hsl.l > 95) return 'Alb';
-                if (hsl.l < 5) return 'Negru';
-                return 'Gri';
+            const h = hsl.h;
+            const s = hsl.s;
+            const l = hsl.l;
+            
+            // CRITICAL: Check for achromatic colors FIRST
+            // Alb, Negru, Gri based on lightness primarily
+            if (s < 15) {  // Very low saturation = achromatic
+                if (l > 90) return 'Alb';
+                if (l < 15) return 'Negru';
+                if (l > 70) return 'Gri deschis';
+                if (l > 40) return 'Gri';
+                return 'Gri închis';
             }
-            if (hsl.h < 30 || hsl.h > 330) return 'Roșu';
-            if (hsl.h < 75) return 'Galben';
-            if (hsl.h < 150) return 'Verde';
-            if (hsl.h < 260) return 'Albastru';
-            return 'Violet';
+            
+            // For colored pixels, use hue
+            if (h >= 345 || h < 15) return 'Roșu';
+            if (h < 45) return 'Portocaliu';
+            if (h < 70) return 'Galben';
+            if (h < 165) return 'Verde';
+            if (h < 250) return 'Albastru';
+            if (h < 330) return 'Violet';
+            return 'Magenta';
         }
 
         function getPattern(r, g, b) {
             const hsl = rgbToHsl(r, g, b);
-            if (hsl.s < 10) return '';
-            if (hsl.h < 30 || hsl.h > 330) return 'pattern-dots';
-            if (hsl.h < 75) return 'pattern-grid';
-            if (hsl.h < 150) return 'pattern-diagonal';
-            return 'pattern-vertical';
+            const h = hsl.h;
+            const s = hsl.s;
+            
+            // No pattern for achromatic colors
+            if (s < 15) return '';
+            
+            // Patterns based on hue ranges
+            if (h >= 345 || h < 15) return 'pattern-dots';      // Roșu
+            if (h < 45) return 'pattern-dots';                   // Portocaliu
+            if (h < 70) return 'pattern-grid';                   // Galben
+            if (h < 165) return 'pattern-diagonal';              // Verde
+            if (h < 250) return 'pattern-vertical';              // Albastru
+            return 'pattern-cross';                              // Violet/Magenta
         }
+        
+        // Add cross pattern
+        const crossPatternStyle = document.createElement('style');
+        crossPatternStyle.textContent = `
+            .pattern-cross {
+                position: relative;
+            }
+            .pattern-cross::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background-image: 
+                    linear-gradient(rgba(0,0,0,0.3) 2px, transparent 2px),
+                    linear-gradient(90deg, rgba(0,0,0,0.3) 2px, transparent 2px);
+                background-size: 12px 12px;
+                pointer-events: none;
+            }
+        `;
+        document.head.appendChild(crossPatternStyle);
 
         function getCategory(r, g, b) {
             const name = getColorName(r, g, b);
@@ -662,6 +701,11 @@
             r = Math.round(r / count);
             g = Math.round(g / count);
             b = Math.round(b / count);
+            
+            // Debug logging
+            const hsl = rgbToHsl(r, g, b);
+            console.log('🎨 RGB:', r, g, b);
+            console.log('🎨 HSL:', `H:${hsl.h}° S:${hsl.s}% L:${hsl.l}%`);
             
             const color = {
                 r, g, b,
@@ -877,13 +921,14 @@
             
             if (tabName === 'compare') {
                 state.compareMode = true;
-                if (state.compareColors.length === 0) {
-                    state.compareColors = [];
-                }
+                // RESET colors when entering compare mode
+                state.compareColors = [];
+                log('Compare mode ON - colors reset');
                 updateCompareBanner();
                 updateCompareTab();
             } else {
                 state.compareMode = false;
+                log('Compare mode OFF');
                 updateCompareBanner();
             }
         }
