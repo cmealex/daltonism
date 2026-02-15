@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#4F46E5">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>ColorHelper</title>
+    <title>ColorHelper - Pentru Daltonism</title>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -14,13 +14,16 @@
             background: #f9fafb;
             touch-action: pan-y;
             -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
         }
         button { 
             -webkit-appearance: none;
             border: none;
             cursor: pointer;
             touch-action: manipulation;
+            transition: transform 0.15s ease;
         }
+        button:active { transform: scale(0.95); }
         .container { max-width: 28rem; margin: 0 auto; }
         
         /* Header */
@@ -71,16 +74,28 @@
             font-weight: 700;
             font-size: 0.875rem;
             text-align: center;
+            transition: all 0.2s ease;
         }
         .tab.active {
             background: #4F46E5;
             color: white;
             border-color: #3730A3;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transform: scale(1.05);
         }
         
         /* Content */
         .content { padding: 1rem; padding-bottom: 6rem; }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .card {
             background: white;
             border-radius: 1.5rem;
@@ -96,6 +111,9 @@
             position: relative;
             height: 20rem;
             background: linear-gradient(135deg, #E5E7EB, #D1D5DB);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         video {
             width: 100%;
@@ -109,6 +127,11 @@
             left: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
         .crosshair-outer {
             width: 6rem;
@@ -177,8 +200,9 @@
             font-size: 1rem;
             border-radius: 1rem;
         }
-        .btn:active {
-            transform: scale(0.95);
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
         /* Color Display */
@@ -262,6 +286,12 @@
             border-radius: 0.75rem;
             border: 2px solid #D1D5DB;
             margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .history-item:active {
+            background: #F3F4F6;
+            transform: scale(0.98);
         }
         .history-box {
             width: 3.5rem;
@@ -304,8 +334,8 @@
             animation: slideDown 0.3s ease;
         }
         @keyframes slideDown {
-            from { transform: translate(-50%, -100%); }
-            to { transform: translate(-50%, 0); }
+            from { transform: translate(-50%, -100%); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
         }
         .notification.error { border-color: #EF4444; }
         .notif-icon {
@@ -333,7 +363,6 @@
         .empty-state {
             text-align: center;
             padding: 3rem 1rem;
-            border: 4px dashed #D1D5DB;
         }
         .empty-icon { font-size: 4rem; margin-bottom: 1rem; }
         .space-y { margin-bottom: 0.75rem; }
@@ -367,7 +396,7 @@
 
     <div class="container content">
         <!-- Camera Tab -->
-        <div id="cameraTab">
+        <div id="cameraTab" class="tab-content active">
             <div class="card">
                 <div class="video-container">
                     <div id="placeholderCamera" class="empty-state">
@@ -427,7 +456,7 @@
         </div>
 
         <!-- Compare Tab -->
-        <div id="compareTab" class="hidden">
+        <div id="compareTab" class="tab-content">
             <div class="card" style="background: linear-gradient(135deg, #E9D5FF, #FBE8FF); border-color: #A855F7;">
                 <div class="card-body">
                     <h2 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.5rem;">🔄 Comparare Culori</h2>
@@ -458,7 +487,7 @@
         </div>
 
         <!-- Saved Tab -->
-        <div id="savedTab" class="hidden">
+        <div id="savedTab" class="tab-content">
             <div id="savedEmpty" class="card">
                 <div class="empty-state">
                     <div class="empty-icon">⭐</div>
@@ -482,6 +511,8 @@
     </div>
 
     <script>
+        console.log('🎨 ColorHelper v2.0 - Starting...');
+
         // State
         const state = {
             currentTab: 'camera',
@@ -491,7 +522,8 @@
             colorHistory: [],
             savedColors: [],
             compareMode: false,
-            compareColors: []
+            compareColors: [],
+            videoReady: false
         };
 
         // Elements
@@ -499,10 +531,15 @@
             video: document.getElementById('video'),
             canvas: document.getElementById('canvas'),
             notification: document.getElementById('notification'),
-            tabs: document.querySelectorAll('.tab')
+            tabs: document.querySelectorAll('.tab'),
+            tabContents: document.querySelectorAll('.tab-content')
         };
 
         // Utility
+        function log(msg, data) {
+            console.log(`[ColorHelper] ${msg}`, data || '');
+        }
+
         function playSound(type = 'success') {
             if (!state.soundEnabled) return;
             try {
@@ -516,7 +553,9 @@
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
                 osc.start();
                 osc.stop(ctx.currentTime + 0.15);
-            } catch(e) {}
+            } catch(e) {
+                log('Sound error', e);
+            }
         }
 
         function vibrate(type = 'success') {
@@ -526,6 +565,7 @@
         }
 
         function showNotification(msg, type = 'success') {
+            log('Notification:', msg);
             const notif = el.notification;
             notif.querySelector('.notif-text').textContent = msg;
             notif.querySelector('.notif-icon').textContent = type === 'success' ? '✓' : '✗';
@@ -594,12 +634,26 @@
 
         // Camera
         async function startCamera() {
+            log('Starting camera...');
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
                 });
+                
                 el.video.srcObject = stream;
                 state.cameraStream = stream;
+                state.videoReady = false;
+                
+                // Wait for video to be ready
+                el.video.onloadedmetadata = () => {
+                    log('Video metadata loaded');
+                    state.videoReady = true;
+                    document.getElementById('detectBtn').disabled = false;
+                };
                 
                 document.getElementById('placeholderCamera').classList.add('hidden');
                 el.video.classList.remove('hidden');
@@ -607,18 +661,23 @@
                 document.getElementById('instruction').classList.remove('hidden');
                 document.getElementById('startCameraBtn').classList.add('hidden');
                 document.getElementById('cameraControls').classList.remove('hidden');
+                document.getElementById('detectBtn').disabled = true; // Disable until ready
                 
                 showNotification('Camera pornită');
+                log('Camera started successfully');
             } catch (err) {
+                log('Camera error:', err);
                 showNotification('Nu pot accesa camera', 'error');
             }
         }
 
         function stopCamera() {
+            log('Stopping camera...');
             if (state.cameraStream) {
                 state.cameraStream.getTracks().forEach(t => t.stop());
                 state.cameraStream = null;
                 el.video.srcObject = null;
+                state.videoReady = false;
                 
                 el.video.classList.add('hidden');
                 document.getElementById('crosshair').classList.add('hidden');
@@ -626,11 +685,25 @@
                 document.getElementById('placeholderCamera').classList.remove('hidden');
                 document.getElementById('cameraControls').classList.add('hidden');
                 document.getElementById('startCameraBtn').classList.remove('hidden');
+                
+                log('Camera stopped');
             }
         }
 
         function detectColor() {
-            if (!el.video.videoWidth) return;
+            if (!state.videoReady) {
+                log('Video not ready yet');
+                showNotification('Așteaptă camera să se încarce...', 'error');
+                return;
+            }
+            
+            if (!el.video.videoWidth || !el.video.videoHeight) {
+                log('Video dimensions not available');
+                showNotification('Camera nu e gata, mai încearcă', 'error');
+                return;
+            }
+            
+            log('Detecting color...');
             
             const ctx = el.canvas.getContext('2d');
             el.canvas.width = el.video.videoWidth;
@@ -662,15 +735,18 @@
                 id: Date.now()
             };
             
+            log('Color detected:', color);
+            
             state.detectedColor = color;
             state.colorHistory.unshift(color);
             state.colorHistory = state.colorHistory.slice(0, 10);
             
             if (state.compareMode && state.compareColors.length < 2) {
+                log('Adding to compare list');
                 state.compareColors.push(color);
                 updateCompareTab();
                 if (state.compareColors.length === 2) {
-                    showNotification('Ambele culori!');
+                    showNotification('Ambele culori detectate!');
                 }
             }
             
@@ -683,6 +759,8 @@
             if (!state.detectedColor) return;
             const c = state.detectedColor;
             
+            log('Updating detected color display');
+            
             document.getElementById('detectedColorBox').style.backgroundColor = c.hex;
             document.getElementById('detectedColorBox').className = 'color-box ' + c.pattern;
             document.getElementById('detectedColorName').textContent = c.name;
@@ -694,6 +772,8 @@
 
         function updateHistory() {
             if (state.colorHistory.length === 0) return;
+            
+            log('Updating history, items:', state.colorHistory.length);
             
             const html = state.colorHistory.slice(0, 5).map((c, i) => `
                 <div class="history-item" data-history-index="${i}">
@@ -708,10 +788,10 @@
             document.getElementById('historyList').innerHTML = html;
             document.getElementById('historyCard').classList.remove('hidden');
             
-            // Add click handlers
             document.querySelectorAll('[data-history-index]').forEach(el => {
                 el.addEventListener('click', function() {
                     const idx = parseInt(this.dataset.historyIndex);
+                    log('History item clicked:', idx);
                     state.detectedColor = state.colorHistory[idx];
                     updateDetectedColor();
                 });
@@ -719,26 +799,43 @@
         }
 
         function switchTab(tabName) {
+            log('Switching to tab:', tabName);
+            
             state.currentTab = tabName;
             
+            // Update tab buttons
             el.tabs.forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabName);
+                const isActive = tab.dataset.tab === tabName;
+                tab.classList.toggle('active', isActive);
             });
             
-            document.getElementById('cameraTab').classList.toggle('hidden', tabName !== 'camera');
-            document.getElementById('compareTab').classList.toggle('hidden', tabName !== 'compare');
-            document.getElementById('savedTab').classList.toggle('hidden', tabName !== 'saved');
+            // Update tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const targetTab = document.getElementById(tabName + 'Tab');
+            if (targetTab) {
+                targetTab.classList.add('active');
+                log('Tab content shown:', tabName);
+            } else {
+                log('ERROR: Tab content not found:', tabName);
+            }
             
             if (tabName === 'compare') {
+                log('Compare mode activated');
                 state.compareMode = true;
                 state.compareColors = [];
                 updateCompareTab();
             } else {
                 state.compareMode = false;
+                log('Compare mode deactivated');
             }
         }
 
         function updateCompareTab() {
+            log('Updating compare tab, colors:', state.compareColors.length);
+            
             const empty = document.getElementById('compareEmpty');
             const emptyText = document.getElementById('compareEmptyText');
             const list = document.getElementById('compareList');
@@ -787,21 +884,29 @@
                 document.getElementById('compareResultText').textContent = 
                     similar ? '⚠️ Culori foarte asemănătoare!' : '✓ Culori diferite!';
                 result.classList.remove('hidden');
+                
+                log('Compare result:', similar ? 'similar' : 'different');
             }
         }
 
         function saveCurrentColor() {
-            if (!state.detectedColor) return;
+            if (!state.detectedColor) {
+                log('No color to save');
+                return;
+            }
             if (state.savedColors.some(c => c.hex === state.detectedColor.hex)) {
                 showNotification('Deja salvată', 'error');
                 return;
             }
+            log('Saving color:', state.detectedColor.hex);
             state.savedColors.push(state.detectedColor);
             updateSavedTab();
             showNotification('Salvată!');
         }
 
         function updateSavedTab() {
+            log('Updating saved tab, items:', state.savedColors.length);
+            
             const empty = document.getElementById('savedEmpty');
             const list = document.getElementById('savedList');
             
@@ -826,11 +931,11 @@
                 
                 document.getElementById('savedColors').innerHTML = html;
                 
-                // Add delete handlers
                 document.querySelectorAll('.delete-color').forEach(btn => {
                     btn.addEventListener('click', function(e) {
                         e.stopPropagation();
                         const id = parseInt(this.dataset.colorId);
+                        log('Deleting color:', id);
                         state.savedColors = state.savedColors.filter(c => c.id !== id);
                         updateSavedTab();
                         showNotification('Ștearsă');
@@ -845,6 +950,7 @@
         document.getElementById('detectBtn').addEventListener('click', detectColor);
         document.getElementById('saveColorBtn').addEventListener('click', saveCurrentColor);
         document.getElementById('resetCompareBtn').addEventListener('click', () => {
+            log('Resetting compare');
             state.compareColors = [];
             updateCompareTab();
             showNotification('Reset');
@@ -853,6 +959,7 @@
         document.getElementById('soundBtn').addEventListener('click', function() {
             state.soundEnabled = !state.soundEnabled;
             this.textContent = state.soundEnabled ? '🔊' : '🔇';
+            log('Sound toggled:', state.soundEnabled);
         });
 
         el.tabs.forEach(tab => {
@@ -863,8 +970,8 @@
 
         // Initialize
         updateSavedTab();
-        
-        console.log('ColorHelper loaded successfully!');
+        log('✅ ColorHelper initialized successfully!');
+        console.log('State:', state);
     </script>
 </body>
 </html>
