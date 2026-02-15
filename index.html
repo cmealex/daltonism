@@ -425,8 +425,20 @@
                 <div class="card-body">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                         <h3 style="font-size: 1.25rem; font-weight: 900;">Detectat</h3>
-                        <button id="saveColorBtn" class="btn btn-small" style="background: #FBBF24; border: 4px solid #D97706;">⭐</button>
+                        <button id="saveColorBtn" class="btn btn-small" style="background: #FBBF24; border: 4px solid #D97706;">⭐ SALVEAZĂ</button>
                     </div>
+                    
+                    <!-- Compare Mode Indicator -->
+                    <div id="compareModeIndicator" class="hidden" style="background: linear-gradient(135deg, #E9D5FF, #FBE8FF); border: 3px solid #A855F7; border-radius: 0.75rem; padding: 0.75rem; margin-bottom: 1rem;">
+                        <div style="font-weight: 900; font-size: 0.875rem; color: #7C3AED; margin-bottom: 0.25rem;">
+                            🔄 MOD COMPARARE ACTIV
+                        </div>
+                        <div style="font-size: 0.75rem; color: #6B21A8;">
+                            <span id="compareCountText">Culoare 1/2 detectată</span> · 
+                            <a href="#" id="viewCompareLink" style="color: #7C3AED; text-decoration: underline;">Vezi rezultat</a>
+                        </div>
+                    </div>
+                    
                     <div class="color-result">
                         <div id="detectedColorBox" class="color-box"></div>
                         <div class="color-info">
@@ -460,7 +472,14 @@
             <div class="card" style="background: linear-gradient(135deg, #E9D5FF, #FBE8FF); border-color: #A855F7;">
                 <div class="card-body">
                     <h2 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.5rem;">🔄 Comparare Culori</h2>
-                    <p style="font-size: 0.875rem; font-weight: 500;">Detectează 2 culori pentru a le compara</p>
+                    <p style="font-size: 0.875rem; font-weight: 500; margin-bottom: 0.75rem;">Perfect pentru a verifica dacă hainele se potrivesc!</p>
+                    <div style="background: rgba(255,255,255,0.5); padding: 0.75rem; border-radius: 0.75rem; font-size: 0.875rem;">
+                        <strong>Cum funcționează:</strong><br>
+                        1️⃣ Mergi la tab CAMERA<br>
+                        2️⃣ Detectează prima culoare (ex: tricou)<br>
+                        3️⃣ Detectează a doua culoare (ex: pantalon)<br>
+                        4️⃣ Revino aici să vezi rezultatul!
+                    </div>
                 </div>
             </div>
 
@@ -468,7 +487,8 @@
                 <div class="empty-state">
                     <div class="empty-icon">⚠️</div>
                     <p id="compareEmptyText" style="font-size: 1.125rem; font-weight: 900; margin-bottom: 0.5rem;">Detectează prima culoare</p>
-                    <p style="font-size: 0.875rem; font-weight: 500;">Mergi la Camera</p>
+                    <p style="font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem;">Mergi la tab CAMERA și apasă DETECTEAZĂ</p>
+                    <button id="goToCameraFromCompare" class="btn btn-primary" style="max-width: 300px; margin: 1rem auto 0;">📷 MERGI LA CAMERA</button>
                 </div>
             </div>
 
@@ -491,8 +511,16 @@
             <div id="savedEmpty" class="card">
                 <div class="empty-state">
                     <div class="empty-icon">⭐</div>
-                    <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.5rem;">Nimic salvat</h3>
-                    <p>Apasă ⭐ la detectare</p>
+                    <h3 style="font-size: 1.25rem; font-weight: 900; margin-bottom: 0.5rem;">Nicio culoare salvată</h3>
+                    <p style="font-size: 0.875rem; margin-bottom: 0.75rem;">Salvează culori pentru acces rapid!</p>
+                    <div style="background: #F3F4F6; padding: 0.75rem; border-radius: 0.75rem; font-size: 0.875rem; max-width: 300px; margin: 0 auto;">
+                        <strong>Cum salvez culori?</strong><br>
+                        1️⃣ Mergi la tab CAMERA<br>
+                        2️⃣ Detectează o culoare<br>
+                        3️⃣ Apasă butonul ⭐ galben<br>
+                        4️⃣ Culoarea apare aici!
+                    </div>
+                    <button id="goToCameraFromSaved" class="btn btn-primary" style="max-width: 300px; margin: 1rem auto 0;">📷 MERGI LA CAMERA</button>
                 </div>
             </div>
 
@@ -745,8 +773,17 @@
                 log('Adding to compare list');
                 state.compareColors.push(color);
                 updateCompareTab();
+                
+                // Show compare mode indicator
+                const indicator = document.getElementById('compareModeIndicator');
+                const countText = document.getElementById('compareCountText');
+                indicator.classList.remove('hidden');
+                countText.textContent = `Culoare ${state.compareColors.length}/2 detectată`;
+                
                 if (state.compareColors.length === 2) {
-                    showNotification('Ambele culori detectate!');
+                    showNotification('Ambele culori detectate! Mergi la tab Compară');
+                } else {
+                    showNotification('Prima culoare OK! Mai detectează încă una');
                 }
             }
             
@@ -825,10 +862,14 @@
             if (tabName === 'compare') {
                 log('Compare mode activated');
                 state.compareMode = true;
-                state.compareColors = [];
+                if (state.compareColors.length === 0) {
+                    state.compareColors = [];
+                }
                 updateCompareTab();
             } else {
                 state.compareMode = false;
+                // Hide compare mode indicator when leaving compare mode
+                document.getElementById('compareModeIndicator').classList.add('hidden');
                 log('Compare mode deactivated');
             }
         }
@@ -848,6 +889,7 @@
                 result.classList.add('hidden');
             } else if (state.compareColors.length === 1) {
                 emptyText.textContent = 'Detectează a doua culoare';
+                empty.querySelector('p:nth-of-type(2)').textContent = 'Apasă DETECTEAZĂ pe a doua culoare!';
                 const c = state.compareColors[0];
                 list.innerHTML = `
                     <div class="card">
@@ -960,6 +1002,23 @@
             state.soundEnabled = !state.soundEnabled;
             this.textContent = state.soundEnabled ? '🔊' : '🔇';
             log('Sound toggled:', state.soundEnabled);
+        });
+
+        // Navigation buttons
+        document.getElementById('goToCameraFromCompare').addEventListener('click', () => {
+            log('Navigate to camera from compare');
+            switchTab('camera');
+        });
+        
+        document.getElementById('goToCameraFromSaved').addEventListener('click', () => {
+            log('Navigate to camera from saved');
+            switchTab('camera');
+        });
+        
+        document.getElementById('viewCompareLink').addEventListener('click', (e) => {
+            e.preventDefault();
+            log('Navigate to compare results');
+            switchTab('compare');
         });
 
         el.tabs.forEach(tab => {
